@@ -44,7 +44,7 @@ jobs:
           export SOAPUI_HOME=/opt/soapui
           export DISPLAY=:99  # Ensure DISPLAY is set for SoapUI
           chmod +x $SOAPUI_HOME/bin/soapui.sh  # Make soapui.sh executable
-          $SOAPUI_HOME/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+          $SOAPUI_HOME/bin/soapui.sh -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
