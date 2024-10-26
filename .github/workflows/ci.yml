@@ -33,20 +33,20 @@ jobs:
           if [ ${{ runner.os }} == 'Linux' ]; then
             wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
             tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
-            mv SoapUI-5.7.2 /opt/soapui
+            sudo mv SoapUI-5.7.2 /opt/soapui
           elif [ ${{ runner.os }} == 'Windows' ]; then
             wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip
             unzip SoapUI-5.7.2-windows-bin.zip -d C:\SoapUI
           else
             wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip
-            mkdir -p ~/soapui
-            unzip SoapUI-5.7.2-mac-bin.zip -d ~/soapui
+            mkdir -p /opt/soapui
+            unzip SoapUI-5.7.2-mac-bin.zip -d /opt/soapui
           fi
-          
-      - name: List SoapUI Directory
+
+      - name: Verify SoapUI Installation
         run: |
-          ls -la ~/soapui
-          
+          ls -la /opt/soapui
+
       - name: Run SoapUI Tests
         run: |
           if [ ${{ runner.os }} == 'Linux' ]; then
@@ -54,7 +54,7 @@ jobs:
           elif [ ${{ runner.os }} == 'Windows' ]; then
             C:\SoapUI\SoapUI-5.7.2\bin\soapui.bat -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           else
-            ~/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+            /opt/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           fi
 
       - name: Generate JUnit Report
