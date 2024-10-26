@@ -29,6 +29,7 @@ jobs:
           wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
           tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
           sudo mv SoapUI-5.7.2 /opt/soapui
+          rm SoapUI-5.7.2-linux-bin.tar.gz  # Clean up
 
       - name: Install Xvfb
         run: sudo apt-get install -y xvfb
@@ -37,14 +38,15 @@ jobs:
         run: |
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 &
-          sleep 3  # Wait for Xvfb to start
+          sleep 3
 
-      - name: Run SoapUI Tests
+      - name: Run SoapUI Tests with testrunner
         run: |
+          set -e  # Stop the script on any error
           export SOAPUI_HOME=/opt/soapui
           export DISPLAY=:99  # Ensure DISPLAY is set for SoapUI
-          chmod +x $SOAPUI_HOME/bin/soapui.sh  # Make soapui.sh executable
-          $SOAPUI_HOME/bin/soapui.sh -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+          chmod +x $SOAPUI_HOME/bin/testrunner.sh
+          $SOAPUI_HOME/bin/testrunner.sh -s"TestSuite 1" -r -a -f results /path/to/your_project-soapui-project.xml
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
