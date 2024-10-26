@@ -39,7 +39,8 @@ jobs:
             unzip SoapUI-5.7.2-windows-bin.zip -d C:\SoapUI
           else
             wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip
-            unzip SoapUI-5.7.2-mac-bin.zip -d /opt/soapui
+            mkdir -p ~/soapui
+            unzip SoapUI-5.7.2-mac-bin.zip -d ~/soapui
           fi
 
       - name: Run SoapUI Tests
