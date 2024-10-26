@@ -26,23 +26,31 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-      
+
       - name: Install SoapUI
         run: |
           echo "Installing SoapUI..."
           if [ ${{ runner.os }} == 'Linux' ]; then
-            wget https://downloads.sourceforge.net/project/soapui/soapui/5.6.0/SoapUI-5.6.0-linux-bin.tar.gz
-            tar -xzf SoapUI-5.6.0-linux-bin.tar.gz
-            mv SoapUI-5.6.0 /opt/soapui
+            wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+            tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
+            mv SoapUI-5.7.2 /opt/soapui
           elif [ ${{ runner.os }} == 'Windows' ]; then
-            echo "Windows installation instructions needed."
+            wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip
+            unzip SoapUI-5.7.2-windows-bin.zip -d C:\SoapUI
           else
-            echo "Mac installation instructions needed."
+            wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip
+            unzip SoapUI-5.7.2-mac-bin.zip -d /opt/soapui
           fi
 
       - name: Run SoapUI Tests
         run: |
-          /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml
+          if [ ${{ runner.os }} == 'Linux' ]; then
+            /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml
+          elif [ ${{ runner.os }} == 'Windows' ]; then
+            C:\SoapUI\SoapUI-5.7.2\bin\soapui.bat -a -r -j -f results -t CountryInfoService-soapui-project.xml
+          else
+            /opt/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml
+          fi
         env:
           SOAPUI_HOME: /opt/soapui
 
