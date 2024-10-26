@@ -38,11 +38,12 @@ jobs:
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 &
           sleep 3  # Wait for Xvfb to start
-          export SOAPUI_HOME=${{ github.workspace }}/bin  # Pointing to your bin directory
-          /bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
 
       - name: Run SoapUI Tests
         run: |
           export SOAPUI_HOME=/opt/soapui
-          export DISPLAY=:99
-          /opt/soapui/bin/soapui-headless.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+          chmod +x $SOAPUI_HOME/bin/soapui.sh  # Make soapui.sh executable
+          $SOAPUI_HOME/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
+          JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
