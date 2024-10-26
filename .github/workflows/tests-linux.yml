@@ -32,10 +32,9 @@ jobs:
 
       - name: Verify SoapUI Installation
         run: |
-          ls -la /opt/soapui
+          ls -la /opt/soapui/bin/
 
-      - name: Run SoapUI Tests in Headless Mode
+      - name: Run SoapUI Tests
         run: |
           export SOAPUI_HOME=/opt/soapui
-          # Run the headless version of SoapUI
-          /opt/soapui/bin/soapui-headless.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+          /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
