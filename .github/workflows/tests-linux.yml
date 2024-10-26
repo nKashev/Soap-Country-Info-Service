@@ -37,4 +37,5 @@ jobs:
       - name: Run SoapUI Tests
         run: |
           export SOAPUI_HOME=/opt/soapui
+          export DISPLAY=:0  # Set DISPLAY to an empty value
           /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
