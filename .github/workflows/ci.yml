@@ -42,7 +42,11 @@ jobs:
             mkdir -p ~/soapui
             unzip SoapUI-5.7.2-mac-bin.zip -d ~/soapui
           fi
-
+          
+      - name: List SoapUI Directory
+        run: |
+          ls -la ~/soapui
+          
       - name: Run SoapUI Tests
         run: |
           if [ ${{ runner.os }} == 'Linux' ]; then
@@ -50,10 +54,9 @@ jobs:
           elif [ ${{ runner.os }} == 'Windows' ]; then
             C:\SoapUI\SoapUI-5.7.2\bin\soapui.bat -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           else
-            /opt/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
+            ~/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           fi
-        env:
-          SOAPUI_HOME: /opt/soapui
+
 
       - name: Generate JUnit Report
         run: |
