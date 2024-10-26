@@ -45,18 +45,17 @@ jobs:
       - name: Run SoapUI Tests
         run: |
           if [ ${{ runner.os }} == 'Linux' ]; then
-            /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml
+            /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           elif [ ${{ runner.os }} == 'Windows' ]; then
-            C:\SoapUI\SoapUI-5.7.2\bin\soapui.bat -a -r -j -f results -t CountryInfoService-soapui-project.xml
+            C:\SoapUI\SoapUI-5.7.2\bin\soapui.bat -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           else
-            /opt/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml
+            /opt/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           fi
         env:
           SOAPUI_HOME: /opt/soapui
 
       - name: Generate JUnit Report
         run: |
-          # You may need to adjust this based on how your results are structured
           echo "Generating JUnit report..."
           mkdir -p junit-results
           cp results/*.xml junit-results/
@@ -64,7 +63,6 @@ jobs:
       - name: Convert JUnit XML to HTML Report
         run: |
           echo "Converting JUnit XML to HTML..."
-          # Install an HTML report generator, e.g., junit2html
           pip install junit2html
           junit2html junit-results/*.xml -o junit-results/report.html
           
