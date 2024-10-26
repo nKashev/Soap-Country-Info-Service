@@ -57,7 +57,6 @@ jobs:
             ~/soapui/SoapUI-5.7.2/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
           fi
 
-
       - name: Generate JUnit Report
         run: |
           echo "Generating JUnit report..."
