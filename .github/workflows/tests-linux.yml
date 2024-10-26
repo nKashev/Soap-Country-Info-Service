@@ -30,12 +30,16 @@ jobs:
           tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
           sudo mv SoapUI-5.7.2 /opt/soapui
 
-      - name: Verify SoapUI Installation
+      - name: Install Xvfb
+        run: sudo apt-get install -y xvfb
+
+      - name: Start Xvfb
         run: |
-          ls -la /opt/soapui/bin/
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1920x1080x24 &
+          sleep 3  # Wait for Xvfb to start
 
       - name: Run SoapUI Tests
         run: |
           export SOAPUI_HOME=/opt/soapui
-          export DISPLAY=:0  # Set DISPLAY to an empty value
           /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
