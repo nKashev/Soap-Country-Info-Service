@@ -1,0 +1,40 @@
+name: Run SOAPUI Project on Ubuntu 
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  schedule:
+    - cron: '15 16 * * *'
+
+jobs:
+  soapui:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install SoapUI
+        run: |
+          echo "Installing SoapUI..."
+          wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+          tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
+          sudo mv SoapUI-5.7.2 /opt/soapui
+
+      - name: Verify SoapUI Installation
+        run: |
+          ls -la /opt/soapui
+
+      - name: Run SoapUI Tests in Headless Mode
+        run: |
+          export SOAPUI_HOME=/opt/soapui
+          /opt/soapui/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true -Djava.awt.headless=true
