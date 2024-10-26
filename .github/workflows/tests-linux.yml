@@ -42,6 +42,7 @@ jobs:
       - name: Run SoapUI Tests
         run: |
           export SOAPUI_HOME=/opt/soapui
+          export DISPLAY=:99  # Ensure DISPLAY is set for SoapUI
           chmod +x $SOAPUI_HOME/bin/soapui.sh  # Make soapui.sh executable
           $SOAPUI_HOME/bin/soapui.sh -a -r -j -f results -t CountryInfoService-soapui-project.xml -Dsoapui.headless=true
         env:
