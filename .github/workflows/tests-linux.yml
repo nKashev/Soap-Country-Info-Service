@@ -46,7 +46,7 @@ jobs:
           export SOAPUI_HOME=/opt/soapui
           export DISPLAY=:99  # Ensure DISPLAY is set for SoapUI
           chmod +x $SOAPUI_HOME/bin/testrunner.sh
-          $SOAPUI_HOME/bin/testrunner.sh -s"TestSuite 1" -r -a -f results /path/to/your_project-soapui-project.xml
+          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
