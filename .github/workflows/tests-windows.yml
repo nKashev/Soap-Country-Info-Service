@@ -15,7 +15,7 @@ jobs:
 
     - name: Install WSL and Ubuntu
       run: |
-        wsl --install -d Ubuntu-22.04
+        wsl --install -d Ubuntu
         wsl --set-default-version 1
       shell: pwsh
 
