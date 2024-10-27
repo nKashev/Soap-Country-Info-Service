@@ -12,11 +12,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Install WSL
+      - name: Install WSL and Ubuntu
         run: |
-          wsl --install
+          wsl --install -d Ubuntu
           wsl --set-default-version 2
-        
+        shell: powershell
+
       - name: Install SoapUI on Linux
         run: |
           wsl wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
@@ -25,7 +26,7 @@ jobs:
 
       - name: Run SoapUI Tests
         run: |
-          wsl /opt/SoapUI-5.7.2/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results /path/to/CountryInfoService-soapui-project.xml
+          wsl /opt/SoapUI-5.7.2/bin/testrunner.sh -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results /path/to/CountryInfoService-soapui-project.xml
 
       - name: Upload Test Reports
         if: always()
