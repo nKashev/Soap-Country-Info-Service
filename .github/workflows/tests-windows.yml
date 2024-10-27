@@ -3,7 +3,7 @@ name: Run SOAPUI Project on Windows
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 16 * * *'
+    - cron: '20 16 * * *'
 
 jobs:
   soapui-windows:
@@ -28,7 +28,7 @@ jobs:
       - name: Run SoapUI Tests
         run: |
           mkdir results
-          $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          & "${Env:SOAPUI_HOME}\bin\testrunner.bat" -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
         shell: pwsh
 
       - name: Upload Test Reports
