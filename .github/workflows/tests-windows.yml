@@ -1,0 +1,38 @@
+name: Run SOAPUI Project on Windows
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 16 * * *'
+
+jobs:
+  soapui-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Install SoapUI on Windows
+        run: |
+          Invoke-WebRequest https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip -OutFile SoapUI-win.zip
+          Expand-Archive -Path SoapUI-win.zip -DestinationPath C:\SoapUI
+          Remove-Item SoapUI-win.zip
+
+      - name: Run SoapUI Tests
+        run: |
+          mkdir results
+          $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+        shell: pwsh
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: soapui-test-reports-windows
+          path: results
