@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Install SoapUI on Windows
         run: |
@@ -19,13 +19,17 @@ jobs:
           Expand-Archive -Path SoapUI-win.zip -DestinationPath C:\SoapUI
           Remove-Item SoapUI-win.zip
           # Set the SOAPUI_HOME environment variable
-          echo "SOAPUI_HOME=C:\SoapUI" >> $GITHUB_ENV
+          echo "SOAPUI_HOME=C:\\SoapUI" >> $GITHUB_ENV
+          
+      - name: Verify SOAPUI_HOME
+        run: |
+          Write-Host "SOAPUI_HOME: $Env:SOAPUI_HOME"
 
       - name: Run SoapUI Tests
         run: |
           mkdir results
-          Write-Host "SOAPUI_HOME: ${Env:SOAPUI_HOME}"
-          & "${Env:SOAPUI_HOME}\bin\testrunner.bat" -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          Write-Host "SOAPUI_HOME: $Env:SOAPUI_HOME"
+          & "$Env:SOAPUI_HOME\bin\testrunner.bat" -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
         shell: pwsh
 
       - name: Upload Test Reports
