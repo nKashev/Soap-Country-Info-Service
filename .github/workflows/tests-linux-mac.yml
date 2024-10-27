@@ -1,0 +1,57 @@
+name: Run SOAPUI Project on Linux and MacOS
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  schedule:
+    - cron: '15 16 * * *'
+
+jobs:
+  soapui-linux-macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Install SoapUI on Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+          tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
+          sudo mv SoapUI-5.7.2 /opt/soapui
+          rm SoapUI-5.7.2-linux-bin.tar.gz
+
+      - name: Install SoapUI on MacOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          curl -L https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip -o SoapUI-mac.zip
+          unzip SoapUI-mac.zip
+          sudo mv SoapUI-5.7.2 /opt/soapui
+          rm SoapUI-mac.zip
+
+      - name: Run SoapUI Tests
+        run: |
+          mkdir -p results
+          export SOAPUI_HOME=/opt/soapui
+          chmod +x $SOAPUI_HOME/bin/testrunner.sh
+          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+        shell: bash
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: soapui-test-reports-${{ matrix.os }}
+          path: results
