@@ -1,0 +1,63 @@
+name: Run SOAPUI Project on Multiple OS 
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  schedule:
+    - cron: '15 16 * * *'
+
+jobs:
+  soapui:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Install SoapUI
+        run: |
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+            tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
+            sudo mv SoapUI-5.7.2 /opt/soapui
+            export SOAPUI_HOME=/opt/soapui
+            rm SoapUI-5.7.2-linux-bin.tar.gz
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            curl -o SoapUI-5.7.2-mac-bin.zip https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip
+            unzip SoapUI-5.7.2-mac-bin.zip -d /Applications
+            export SOAPUI_HOME=/Applications/SoapUI-5.7.2
+            rm SoapUI-5.7.2-mac-bin.zip
+          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            Invoke-WebRequest -Uri https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip -OutFile SoapUI.zip
+            Expand-Archive -Path SoapUI.zip -DestinationPath C:\SoapUI
+            Remove-Item SoapUI.zip
+          fi
+        shell: bash
+
+      - name: Run SoapUI Tests
+        run: |
+          mkdir -p results
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ] || [ "${{ matrix.os }}" == "macos-latest" ]; then
+            $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          fi
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: soapui-test-reports
+          path: results
