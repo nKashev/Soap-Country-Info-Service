@@ -46,15 +46,15 @@ jobs:
           export SOAPUI_HOME=/opt/soapui
           export DISPLAY=:99
           chmod +x $SOAPUI_HOME/bin/testrunner.sh
-          mkdir -p results/html-report
-          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results -R"JUnit-Style HTML Report" CountryInfoService-soapui-project.xml
+          mkdir -p results
+          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
 
       - name: Archive Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: soapui-test-reports
           path: results
