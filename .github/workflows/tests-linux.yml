@@ -1,4 +1,4 @@
-name: Run SOAPUI Project on Ubuntu 
+name: Run SOAPUI Project on Multiple OS 
 
 on:
   workflow_dispatch:
@@ -11,7 +11,10 @@ on:
 
 jobs:
   soapui:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - name: Checkout code
@@ -23,38 +26,47 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Install SoapUI
+      - name: Install SoapUI on Linux
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          echo "Installing SoapUI..."
           wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
           tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
           sudo mv SoapUI-5.7.2 /opt/soapui
           rm SoapUI-5.7.2-linux-bin.tar.gz
 
-      - name: Install Xvfb
-        run: sudo apt-get install -y xvfb
-
-      - name: Start Xvfb
+      - name: Install SoapUI on MacOS
+        if: matrix.os == 'macos-latest'
         run: |
-          export DISPLAY=:99
-          Xvfb :99 -screen 0 1920x1080x24 &
-          sleep 3
+          curl -L https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-mac-bin.zip -o SoapUI-mac.zip
+          unzip SoapUI-mac.zip
+          sudo mv SoapUI-5.7.2 /opt/soapui
+          rm SoapUI-mac.zip
 
-      - name: Run SoapUI Tests with testrunner
+      - name: Install SoapUI on Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          set -e  # Stop the script on any error
-          export SOAPUI_HOME=/opt/soapui
-          export DISPLAY=:99
-          chmod +x $SOAPUI_HOME/bin/testrunner.sh
+          Invoke-WebRequest https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip -OutFile SoapUI-win.zip
+          Expand-Archive -Path SoapUI-win.zip -DestinationPath C:\SoapUI
+          Remove-Item SoapUI-win.zip
+
+      - name: Run SoapUI Tests
+        run: |
+          # Create the results directory
           mkdir -p results
-          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
-        env:
-          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
-          JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
+          
+          # Run tests based on OS
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" || "${{ matrix.os }}" == "macos-latest" ]]; then
+            export SOAPUI_HOME=/opt/soapui
+            chmod +x $SOAPUI_HOME/bin/testrunner.sh
+            $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            set SOAPUI_HOME=C:\SoapUI
+            $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          fi
 
-      - name: Archive Test Results
+      - name: Upload Test Reports
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: soapui-test-reports
+          name: soapui-test-reports-${{ matrix.os }}
           path: results
