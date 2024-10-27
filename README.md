@@ -1,6 +1,6 @@
 # Soap-Country-Info-Service
 
-This repository contains a SOAPUI project, which is used to test the [CountryInfoService](webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso). The project includes various SOAP requests to retrieve country data.
+This repository contains a SOAPUI project, which is used to test the [CountryInfoService](http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso). The project includes various SOAP requests to retrieve country data.
 
 Additionally, the repository is configured with a GitHub Action workflow to automate the testing via schedule on multiple OS.
 
