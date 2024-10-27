@@ -8,33 +8,28 @@ on:
 jobs:
   soapui:
     runs-on: windows-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Install SoapUI on Windows
+        
+      - name: Install WSL
         run: |
-          Invoke-WebRequest https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip -OutFile SoapUI-win.zip
-          Expand-Archive -Path SoapUI-win.zip -DestinationPath C:\SoapUI
-          Remove-Item SoapUI-win.zip
-          # Set the SOAPUI_HOME environment variable
-          echo "SOAPUI_HOME=C:\\SoapUI" >> $GITHUB_ENV
-          
-      - name: Verify SOAPUI_HOME
+          wsl --install
+          wsl --set-default-version 2
+        
+      - name: Install SoapUI on Linux
         run: |
-          Write-Host "SOAPUI_HOME: $Env:SOAPUI_HOME"
+          wsl wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+          wsl tar -xzf SoapUI-5.7.2-linux-bin.tar.gz -C /opt/
+          wsl rm SoapUI-5.7.2-linux-bin.tar.gz
 
       - name: Run SoapUI Tests
         run: |
-          mkdir results
-          Write-Host "SOAPUI_HOME: $Env:SOAPUI_HOME"
-          & "$Env:SOAPUI_HOME\bin\testrunner.bat" -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
-        shell: pwsh
+          wsl /opt/SoapUI-5.7.2/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results /path/to/CountryInfoService-soapui-project.xml
 
       - name: Upload Test Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: soapui-test-reports-windows
+          name: soapui-test-reports
           path: results
