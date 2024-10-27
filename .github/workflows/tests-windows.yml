@@ -6,24 +6,20 @@ on:
     - cron: '20 16 * * *'
 
 jobs:
-  soapui-windows:
+  soapui:
     runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-
       - name: Install SoapUI on Windows
         run: |
           Invoke-WebRequest https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-windows-bin.zip -OutFile SoapUI-win.zip
           Expand-Archive -Path SoapUI-win.zip -DestinationPath C:\SoapUI
           Remove-Item SoapUI-win.zip
+          # Set the SOAPUI_HOME environment variable
+          echo "SOAPUI_HOME=C:\SoapUI" >> $GITHUB_ENV
 
       - name: Run SoapUI Tests
         run: |
@@ -33,6 +29,7 @@ jobs:
         shell: pwsh
 
       - name: Upload Test Reports
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: soapui-test-reports-windows
