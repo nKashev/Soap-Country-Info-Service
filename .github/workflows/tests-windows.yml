@@ -6,25 +6,29 @@ on:
     - cron: '20 16 * * *'
 
 jobs:
-  soapui:
+  build:
     runs-on: windows-latest
+
     steps:
-      - name: Install Specific Ubuntu Version
-        run: |
-          wsl --install -d Ubuntu-24.04
-          wsl --set-default-version 2
-        shell: powershell
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Run SoapUI Tests
-        run: |
-          wsl wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
-          wsl tar -xzf SoapUI-5.7.2-linux-bin.tar.gz -C /opt/
-          wsl rm SoapUI-5.7.2-linux-bin.tar.gz
-          wsl /opt/SoapUI-5.7.2/bin/testrunner.sh -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results /path/to/CountryInfoService-soapui-project.xml
+    - name: Install WSL and Ubuntu
+      run: |
+        wsl --install -d Ubuntu-22.04
+        wsl --set-default-version 2
+      shell: pwsh
 
-      - name: Upload Test Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: soapui-test-reports
-          path: results
+    - name: Run SoapUI Tests
+      run: |
+        wsl wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
+        wsl tar -xzf SoapUI-5.7.2-linux-bin.tar.gz -C /opt/
+        wsl rm SoapUI-5.7.2-linux-bin.tar.gz
+        wsl /opt/SoapUI-5.7.2/bin/testrunner.sh -s "CountryInfoServiceSoapBinding TestSuite" -r -a -f results /path/to/CountryInfoService-soapui-project.xml
+      shell: pwsh
+
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: SoapUI-results
+        path: results/
