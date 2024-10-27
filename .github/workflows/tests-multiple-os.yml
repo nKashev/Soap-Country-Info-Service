@@ -46,15 +46,19 @@ jobs:
           fi
         shell: bash
 
-      - name: Run SoapUI Tests
+      - name: Run SoapUI Tests (Linux & MacOS)
+        if: runner.os != 'Windows'
         run: |
           mkdir -p results
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ] || [ "${{ matrix.os }}" == "macos-latest" ]; then
-            $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
-          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-            $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
-          fi
-        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash' }}
+          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+        shell: bash
+
+      - name: Run SoapUI Tests (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir results
+          $Env:SOAPUI_HOME\bin\testrunner.bat -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+        shell: pwsh
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
