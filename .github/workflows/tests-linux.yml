@@ -29,7 +29,7 @@ jobs:
           wget https://dl.eviware.com/soapuios/5.7.2/SoapUI-5.7.2-linux-bin.tar.gz
           tar -xzf SoapUI-5.7.2-linux-bin.tar.gz
           sudo mv SoapUI-5.7.2 /opt/soapui
-          rm SoapUI-5.7.2-linux-bin.tar.gz  # Clean up
+          rm SoapUI-5.7.2-linux-bin.tar.gz
 
       - name: Install Xvfb
         run: sudo apt-get install -y xvfb
@@ -44,9 +44,17 @@ jobs:
         run: |
           set -e  # Stop the script on any error
           export SOAPUI_HOME=/opt/soapui
-          export DISPLAY=:99  # Ensure DISPLAY is set for SoapUI
+          export DISPLAY=:99
           chmod +x $SOAPUI_HOME/bin/testrunner.sh
-          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results CountryInfoService-soapui-project.xml
+          mkdir -p results/html-report
+          $SOAPUI_HOME/bin/testrunner.sh -s"CountryInfoServiceSoapBinding TestSuite" -r -a -f results -R"JUnit-Style HTML Report" CountryInfoService-soapui-project.xml
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.12-7/x64
+
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: soapui-test-reports
+          path: results
