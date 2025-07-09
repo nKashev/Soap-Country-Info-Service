@@ -6,8 +6,8 @@ on:
   #   branches:
   #     - main
   # pull_request:
-  schedule:
-    - cron: '15 16 * * *'
+  # schedule:
+  #   - cron: '15 16 * * *'
 
 jobs:
   soapui-linux-macos:
